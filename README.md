@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://cdn.discordapp.com/attachments/420367190580002851/1032411747031724132/Logo-jjMeteor.png" alt="JJmeteor-logo" width="15%"/>
+<img src="https://cdn.discordapp.com/attachments/420367190580002851/1032411747031724132/Logo-jjMeteor.png" alt="JJmeteor-logo" width="40%"/>
 </p>
 
 <h1 align="center">Meteor Client</h1>
