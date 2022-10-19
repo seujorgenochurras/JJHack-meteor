@@ -156,6 +156,16 @@ public class MeteorClient implements ClientModInitializer {
         else if (Utils.canOpenGui()) Tabs.get().get(0).openScreen(GuiThemes.get());
     }
 
+
+
+    //JJhack
+
+    //CrackedAccount myAccount = new CrackedAccount("JDev");
+    //myAccount.login();
+    //System.out.printf("Looged to %s \n", myAccount.getUsername());
+
+
+
     // Hide HUD
 
     private boolean wasWidgetScreen, wasHudHiddenRoot;

@@ -7,6 +7,7 @@ package meteordevelopment.meteorclient.systems.modules;
 
 import meteordevelopment.meteorclient.addons.AddonManager;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
+import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 
 public class Categories {
@@ -16,7 +17,7 @@ public class Categories {
     public static final Category Render = new Category("Render", Items.GLASS.getDefaultStack());
     public static final Category World = new Category("World", Items.GRASS_BLOCK.getDefaultStack());
     public static final Category Misc = new Category("Misc", Items.LAVA_BUCKET.getDefaultStack());
-
+    public static final Category JJHACK = new Category("JJhack", Items.POTATO.getDefaultStack());
     public static boolean REGISTERING;
 
     public static void init() {
@@ -29,6 +30,7 @@ public class Categories {
         Modules.registerCategory(Render);
         Modules.registerCategory(World);
         Modules.registerCategory(Misc);
+        Modules.registerCategory(JJHACK);
 
         // Addons
         AddonManager.ADDONS.forEach(MeteorAddon::onRegisterCategories);
