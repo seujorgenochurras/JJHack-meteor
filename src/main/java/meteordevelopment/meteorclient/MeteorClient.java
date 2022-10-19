@@ -14,9 +14,7 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiThemes;
 import meteordevelopment.meteorclient.gui.WidgetScreen;
 import meteordevelopment.meteorclient.gui.tabs.Tabs;
-import meteordevelopment.meteorclient.mixin.MinecraftClientAccessor;
 import meteordevelopment.meteorclient.systems.Systems;
-import meteordevelopment.meteorclient.systems.accounts.types.CrackedAccount;
 import meteordevelopment.meteorclient.systems.config.Config;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -38,13 +36,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
-import net.minecraft.client.util.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.invoke.MethodHandles;
-import java.util.Optional;
 
 public class MeteorClient implements ClientModInitializer {
     public static final String MOD_ID = "meteor-client";
@@ -95,9 +91,7 @@ public class MeteorClient implements ClientModInitializer {
             try {
                 EVENT_BUS.registerLambdaFactory(addon.getPackage(), (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
             } catch (AbstractMethodError e) {
-                AbstractMethodError exception = new AbstractMethodError("Addon \"%s\" is too old and cannot be ran.".formatted(addon.name));
-                exception.addSuppressed(e);
-                throw exception;
+                throw new RuntimeException("Addon \"%s\" is too old and cannot be ran.".formatted(addon.name), e);
             }
         });
 
@@ -134,10 +128,6 @@ public class MeteorClient implements ClientModInitializer {
             Systems.save();
             GuiThemes.save();
         }));
-        //JJhack
-        //CrackedAccount myAccount = new CrackedAccount("JDev");
-        //myAccount.login();
-        //System.out.printf("Looged to %s \n", myAccount.getUsername());
     }
 
     @EventHandler
@@ -150,19 +140,20 @@ public class MeteorClient implements ClientModInitializer {
     @EventHandler
     private void onKey(KeyEvent event) {
         if (event.action == KeyAction.Press && KeyBinds.OPEN_GUI.matchesKey(event.key, 0)) {
-            openGui();
+            toggleGui();
         }
     }
 
     @EventHandler
     private void onMouseButton(MouseButtonEvent event) {
         if (event.action == KeyAction.Press && KeyBinds.OPEN_GUI.matchesMouse(event.button)) {
-            openGui();
+            toggleGui();
         }
     }
 
-    private void openGui() {
-        if (Utils.canOpenGui()) Tabs.get().get(0).openScreen(GuiThemes.get());
+    private void toggleGui() {
+        if (Utils.canCloseGui()) mc.currentScreen.close();
+        else if (Utils.canOpenGui()) Tabs.get().get(0).openScreen(GuiThemes.get());
     }
 
     // Hide HUD
