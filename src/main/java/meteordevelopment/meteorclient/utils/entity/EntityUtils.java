@@ -128,7 +128,7 @@ public class EntityUtils {
 
     public static BlockPos getCityBlock(PlayerEntity player) {
         List<BlockPos> posList = getSurroundBlocks(player);
-        posList.sort(Comparator.comparingDouble(PlayerUtils::squaredDistanceTo));
+        posList.sort(Comparator.comparingDouble(PlayerUtils::distanceTo));
         return posList.isEmpty() ? null : posList.get(0);
     }
 

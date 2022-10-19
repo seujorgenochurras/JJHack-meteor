@@ -121,7 +121,7 @@ public class NoFall extends Module {
         }
 
         // Bucket mode
-        else if (mode.get() == Mode.Bucket) {
+        if (mode.get() == Mode.Bucket) {
             if (mc.player.fallDistance > 3 && !EntityUtils.isAboveWater(mc.player)) {
                 // Place water
                 FindItemResult waterBucket = InvUtils.findInHotbar(Items.WATER_BUCKET);

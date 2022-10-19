@@ -34,7 +34,7 @@ public class Capes {
     private static final List<Cape> TO_RETRY = new ArrayList<>();
     private static final List<Cape> TO_REMOVE = new ArrayList<>();
 
-    @PreInit(dependencies = MeteorExecutor.class)
+    @PreInit
     public static void init() {
         OWNERS.clear();
         URLS.clear();

@@ -21,6 +21,7 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.System;
 import meteordevelopment.meteorclient.systems.Systems;
+import meteordevelopment.meteorclient.systems.modules.JJhack.JAutoSprint;
 import meteordevelopment.meteorclient.systems.modules.combat.*;
 import meteordevelopment.meteorclient.systems.modules.misc.*;
 import meteordevelopment.meteorclient.systems.modules.misc.swarm.Swarm;
@@ -89,6 +90,7 @@ public class Modules extends System<Modules> {
         initRender();
         initWorld();
         initMisc();
+        initJJhack();
     }
 
     @Override
@@ -377,6 +379,11 @@ public class Modules extends System<Modules> {
         // Register color settings for the module
         module.settings.registerColorSettings(module);
     }
+    private void initJJhack(){
+        add (new JAutoSprint());
+
+    }
+
 
     private void initCombat() {
         add(new AimAssist());
@@ -534,7 +541,6 @@ public class Modules extends System<Modules> {
         add(new InfinityMiner());
         add(new LiquidFiller());
         add(new MountBypass());
-        add(new NoGhostBlocks());
         add(new Nuker());
         add(new StashFinder());
         add(new SpawnProofer());

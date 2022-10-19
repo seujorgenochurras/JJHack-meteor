@@ -124,15 +124,9 @@ public abstract class ClientPlayerInteractionManagerMixin implements IClientPlay
         blockBreakingCooldown = value;
     }
 
-    @Inject(method = "breakBlock", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "breakBlock", at = @At("HEAD"))
     private void onBreakBlock(BlockPos blockPos, CallbackInfoReturnable<Boolean> info) {
-        final BreakBlockEvent event = BreakBlockEvent.get(blockPos);
-        MeteorClient.EVENT_BUS.post(event);
-
-        if (event.isCancelled()) {
-            info.setReturnValue(false);
-            info.cancel();
-        }
+        MeteorClient.EVENT_BUS.post(BreakBlockEvent.get(blockPos));
     }
 
     @Inject(method = "interactItem", at = @At("HEAD"), cancellable = true)

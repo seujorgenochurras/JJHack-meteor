@@ -13,7 +13,6 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
@@ -111,7 +110,7 @@ public class AutoMount extends Module {
         if (mc.player.hasVehicle()) return;
 
         for (Entity entity : mc.world.getEntities()){
-            if (!PlayerUtils.isWithin(entity, 4)) continue;
+            if (mc.player.distanceTo(entity) > 4) continue;
 
             if (mc.player.getMainHandStack().getItem() instanceof SpawnEggItem) return;
 

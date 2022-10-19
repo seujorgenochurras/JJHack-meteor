@@ -8,6 +8,7 @@ package meteordevelopment.meteorclient.systems.modules.movement.elytrafly;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
+import meteordevelopment.meteorclient.events.world.PlaySoundEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
 import meteordevelopment.meteorclient.settings.*;
@@ -18,26 +19,34 @@ import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.modes.P
 import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.modes.Pitch40;
 import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.modes.Vanilla;
 import meteordevelopment.meteorclient.systems.modules.player.ChestSwap;
-import meteordevelopment.meteorclient.systems.modules.render.Freecam;
-import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.sound.Sound;
+import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.screen.ScreenTexts;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
 public class ElytraFly extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgInventory = settings.createGroup("Inventory");
     private final SettingGroup sgAutopilot = settings.createGroup("Autopilot");
+
+    private final SettingGroup sgJJhack = settings.createGroup("JJhack");
 
     // General
 
@@ -96,13 +105,6 @@ public class ElytraFly extends Module {
         .name("no-unloaded-chunks")
         .description("Stops you from going into unloaded chunks.")
         .defaultValue(true)
-        .build()
-    );
-
-    public final Setting<Boolean> autoHover = sgGeneral.add(new BoolSetting.Builder()
-        .name("auto-hover")
-        .description("Automatically hover .3 blocks off ground when holding shift.")
-        .defaultValue(false)
         .build()
     );
 
@@ -241,6 +243,64 @@ public class ElytraFly extends Module {
         .build()
     );
 
+    public enum JJHackMode {
+        Off,
+        AnarchyExploitsFixes
+    }
+    public enum JJFlyVersion{
+        Old,
+        New
+    }
+
+
+    //JJhack
+
+    public final Setting<JJHackMode> modeSetting = sgJJhack.add(new EnumSetting.Builder<JJHackMode>()
+            .name("JJHackMode")
+            .description("Mode of JJhack Elytra Fly")
+            .defaultValue(JJHackMode.Off)
+            .build()
+    );
+    public final Setting<JJFlyVersion> jFlySetting = sgJJhack.add(new EnumSetting.Builder<JJFlyVersion>()
+            .name("JJFlyVersion")
+            .description("Version of Elytra fly bypass")
+            .defaultValue(JJFlyVersion.New)
+            .visible(()-> !modeSetting.get().equals(JJHackMode.Off))
+            .build()
+
+    );
+    public final Setting<Boolean> logInChat = sgJJhack.add(new BoolSetting.Builder()
+            .name("Chat print")
+            .description("Prints on chat if plugin stoped elytra fly")
+            .defaultValue(false)
+            .visible( ()-> modeSetting.get().equals(JJHackMode.AnarchyExploitsFixes))
+            .build()
+    );
+    public final Setting<Integer> checkDelay = sgJJhack.add(new IntSetting.Builder()
+            .name("Check Delay")
+            .description("Check if player is on a new chunk, if it is, elytra fly will go speeeed, in TICKS Per Second")
+            .defaultValue(100)
+            .sliderMax(500)
+            .visible( ()-> modeSetting.get().equals(JJHackMode.AnarchyExploitsFixes) || jFlySetting.get().equals(JJFlyVersion.New))
+            .min(5)
+            .build()
+    );
+
+
+    public final Setting<Double> horizontalFast = sgJJhack.add(new DoubleSetting.Builder()
+            .name("fast horizontal speed")
+            .description("Horizontal speed when u need to go fast")
+            .defaultValue(2)
+            .visible( ()-> modeSetting.get().equals(JJHackMode.AnarchyExploitsFixes))
+            .build()
+    );
+    public final Setting<Double> horizontalSlow = sgJJhack.add(new DoubleSetting.Builder()
+            .name("slow horizontal speed")
+            .description("Horizontal speed when u need to go slow")
+            .defaultValue(1)
+            .visible( ()-> modeSetting.get().equals(JJHackMode.AnarchyExploitsFixes))
+            .build()
+    );
     private ElytraFlightMode currentMode = new Vanilla();
 
     public ElytraFly() {
@@ -324,38 +384,65 @@ public class ElytraFly extends Module {
                 ((IVec3d) event.movement).set(0, currentMode.velY, 0);
             }
         }
+    }
 
-        if (autoHover.get() && mc.player.input.sneaking && !Modules.get().get(Freecam.class).isActive() && mc.player.isFallFlying()) {
-            BlockState underState = mc.world.getBlockState(mc.player.getBlockPos().down());
-            Block under = underState.getBlock();
-            BlockState under2State = mc.world.getBlockState(mc.player.getBlockPos().down().down());
-            Block under2 = under2State.getBlock();
+    //JJHack
+    @EventHandler
+    private void onSpeedSlow(PlaySoundEvent event){
 
-            final boolean underCollidable = under.collidable || !underState.getFluidState().isEmpty();
-            final boolean under2Collidable = under2.collidable || !under2State.getFluidState().isEmpty();
+        if(modeSetting.get() != JJHackMode.Off) {
 
-            if (!underCollidable && under2Collidable) {
-                ((IVec3d)event.movement).set(event.movement.x, -0.1f, event.movement.z);
+                if (mc.player.isFallFlying() && event.sound.getId().getPath().equals("entity.experience_orb.pickup")) {
+                 this.horizontalSpeed.set(horizontalSlow.get() + 0.017);
+                 if (logInChat.get()) {
+                     info("Speed slow");
+                    }
 
-                mc.player.setPitch(Utils.clamp(mc.player.getPitch(0), -50.f, 20.f)); // clamp between -50 and 20 (>= 30 will pop you off, but lag makes that threshold lower)
-            }
-
-            if (underCollidable) {
-                ((IVec3d)event.movement).set(event.movement.x, -0.03f, event.movement.z);
-
-                mc.player.setPitch(Utils.clamp(mc.player.getPitch(0), -50.f, 20.f));
-
-                if (mc.player.getPos().y <= mc.player.getBlockPos().down().getY() + 1.34f) {
-                    ((IVec3d)event.movement).set(event.movement.x, 0, event.movement.z);
-                    mc.player.setSneaking(false);
-                    mc.player.input.sneaking = false;
-                }
             }
         }
     }
 
+
+        private String actionBar;
+        public void setActionBar(String actionBar){
+            this.actionBar = actionBar;
+        }
+        public String getActionBar(){
+            return this.actionBar;
+        }
     @EventHandler
     private void onTick(TickEvent.Post event) {
+        if(modeSetting.get() != JJHackMode.Off) {
+            if(jFlySetting.get().equals(JJFlyVersion.Old)){
+                int tick = 0;
+            tick++;
+            if (tick == checkDelay.get()) {
+                this.horizontalSpeed.set(horizontalFast.get() + 0.017);
+                tick = 0;
+                if (logInChat.get()) {
+                    info("Speed fast");
+                }
+                }
+            } else if (jFlySetting.get().equals(JJFlyVersion.New)){
+                String actionBar = getActionBar();
+                if(actionBar.length() > 0){
+                       System.out.println(actionBar.charAt(18));
+                   if(actionBar.charAt(18) == 'O'){
+                        this.horizontalSpeed.set(horizontalFast.get() + 0.018);
+                    } if(actionBar.charAt(18) == 'N' || actionBar.charAt(18) == 'A'){
+                       this.horizontalSpeed.set(horizontalSlow.get() + 0.018);
+                    }
+                }
+                /*
+                * "You are flying in NEW" [20] N = [18]
+                * "You are flying in OLD" [20] O = [18]
+                * "Turn down your elytra settings, speed is restricted in new chunks" [64] A = [18]
+                * "Turn down your elytra settings, speed is restricted in spawn chunks" [66] A = [18]
+                * "Turn down your elytra settings, you are going too fast" [53] A = [18]
+                *
+                * */
+            }
+        }
         currentMode.onTick();
     }
 

@@ -68,5 +68,3 @@ accessible   class   net/minecraft/client/gui/screen/ingame/BeaconScreen$BeaconB
 accessible   class   net/minecraft/client/gui/screen/ingame/BeaconScreen$EffectButtonWidget
 
 accessible   class   net/minecraft/client/resource/ResourceReloadLogger$ReloadState
-
-accessible   field   net/minecraft/block/AbstractBlock collidable Z

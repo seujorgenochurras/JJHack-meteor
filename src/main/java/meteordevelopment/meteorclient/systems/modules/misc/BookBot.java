@@ -172,8 +172,8 @@ public class BookBot extends Module {
         }
 
         // If somehow it failed, just dont do anything until it tries again
-        boolean foundFinalBook = InvUtils.testInMainHand(Items.WRITABLE_BOOK);
-        if (foundFinalBook) return;
+        FindItemResult finalBook = InvUtils.findInHotbar(Items.WRITABLE_BOOK);
+        if (!finalBook.isMainHand()) return;
 
         // Check delay
         if (delayTimer > 0) {
