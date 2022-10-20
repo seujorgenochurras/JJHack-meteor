@@ -1,6 +1,5 @@
-
 <p align="center">
-<img src="https://meteorclient.com/icon.png" alt="meteor-client-logo" width="15%"/>
+<img src="https://cdn.discordapp.com/attachments/420367190580002851/1032411747031724132/Logo-jjMeteor.png" alt="JJmeteor-logo" width="40%"/>
 </p>
 
 <h1 align="center">Meteor Client</h1>
@@ -16,6 +15,27 @@
     <img src="https://img.shields.io/github/languages/code-size/MeteorDevelopment/meteor-client" alt="GitHub code size in bytes"/>
     <img src="https://tokei.rs/b1/github/MeteorDevelopment/meteor-client" alt="GitHub lines of code"/>
 </div>
+
+# JJHack
+**MOD IS MADE ESPECIALLY FOR AntiAnarchyFixes**
+
+I've been doing this skid just for learning more about Java and hacking in general, i'm a total newfag and have no knowledge about what i'm doing so
+pls dont be serious about this mod
+
+This mod is focused on a Brazilian anarchy server (Anarkcraft), so i will try my best to show every exploit that i find
+
+## Modules & Bypasses
+First of all, there's NO ACTUALL bypass (at least for now)
+The skid right now had only change the Elytra Fly module and created a dummy category (HUD)
+
+### Elytra Fly changes:
+   - Bypass on limit of your elytra's speed (you will go ~0.02 faster);
+   - Faster Elytra fly on AnarchyExploitsFixes anti Elytra
+        By checking the screen where it says if player is able to go faster or not;
+        Or by time checking if player is able to go faster;
+
+and of course, i would like to receive advices (without telling me im a stupid simpson's monkey or smth)
+
 
 ## Usage
 
