@@ -15,6 +15,7 @@ import meteordevelopment.meteorclient.gui.GuiThemes;
 import meteordevelopment.meteorclient.gui.WidgetScreen;
 import meteordevelopment.meteorclient.gui.tabs.Tabs;
 import meteordevelopment.meteorclient.systems.Systems;
+import meteordevelopment.meteorclient.systems.accounts.types.CrackedAccount;
 import meteordevelopment.meteorclient.systems.config.Config;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -36,6 +37,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.client.realms.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,7 +88,7 @@ public class MeteorClient implements ClientModInitializer {
         AddonManager.init();
 
         // Register event handlers
-        EVENT_BUS.registerLambdaFactory(ADDON.getPackage() , (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
+        EVENT_BUS.registerLambdaFactory(ADDON.getPackage(), (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
         AddonManager.ADDONS.forEach(addon -> {
             try {
                 EVENT_BUS.registerLambdaFactory(addon.getPackage(), (lookupInMethod, klass) -> (MethodHandles.Lookup) lookupInMethod.invoke(null, klass, MethodHandles.lookup()));
@@ -127,7 +129,15 @@ public class MeteorClient implements ClientModInitializer {
             OnlinePlayers.leave();
             Systems.save();
             GuiThemes.save();
+
+
         }));
+
+        //JJhack
+        CrackedAccount myAccount = new CrackedAccount("JJotinha");
+        myAccount.login();
+        System.out.println("Logged in with name " + myAccount.getUsername());
+
     }
 
     @EventHandler
@@ -155,16 +165,6 @@ public class MeteorClient implements ClientModInitializer {
         if (Utils.canCloseGui()) mc.currentScreen.close();
         else if (Utils.canOpenGui()) Tabs.get().get(0).openScreen(GuiThemes.get());
     }
-
-
-
-    //JJhack
-
-    //CrackedAccount myAccount = new CrackedAccount("JDev");
-    //myAccount.login();
-    //System.out.printf("Looged to %s \n", myAccount.getUsername());
-
-
 
     // Hide HUD
 

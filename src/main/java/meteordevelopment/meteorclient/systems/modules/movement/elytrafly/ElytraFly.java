@@ -9,6 +9,7 @@ package meteordevelopment.meteorclient.systems.modules.movement.elytrafly;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
+import meteordevelopment.meteorclient.events.world.PlaySoundEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
 import meteordevelopment.meteorclient.settings.*;
@@ -256,7 +257,7 @@ public class ElytraFly extends Module {
            .defaultValue(100)
            .sliderMax(500)
            .visible(() -> modeSetting.get().equals(JJHackMode.AnarchyExploitsFixes)
-                   || jFlySetting.get().equals(JJFlyVersion.New))
+                   && !jFlySetting.get().equals(JJFlyVersion.New))
            .min(5)
            .build());
 
@@ -400,11 +401,10 @@ public class ElytraFly extends Module {
    // JJHack
    @EventHandler
    private void onSpeedSlow(PlaySoundEvent event) {
-
       if (modeSetting.get() != JJHackMode.Off) {
 
-         assert mc.player != null;
          if (mc.player.isFallFlying() && event.sound.getId().getPath().equals("entity.experience_orb.pickup")) {
+            event.setCancelled(true);
             this.horizontalSpeed.set(horizontalSlow.get() + 0.017);
             if (logInChat.get()) {
                info("Speed slow");
@@ -426,13 +426,13 @@ public class ElytraFly extends Module {
 
    @EventHandler
    private void onTick(TickEvent.Post event) {
+      currentMode.onTick();
       if (modeSetting.get() != JJHackMode.Off) {
          if (jFlySetting.get().equals(JJFlyVersion.Old)) {
             int tick = 0;
             tick++;
             if (tick == checkDelay.get()) {
                this.horizontalSpeed.set(horizontalFast.get() + 0.017);
-               tick = 0;
                if (logInChat.get()) {
                   info("Speed fast");
                }
@@ -440,7 +440,7 @@ public class ElytraFly extends Module {
          } else if (jFlySetting.get().equals(JJFlyVersion.New)) {
             String actionBar = getActionBar();
             if (actionBar.length() > 0) {
-               System.out.println(actionBar.charAt(18));
+
                if (actionBar.charAt(18) == 'O') {
                   this.horizontalSpeed.set(horizontalFast.get() + 0.018);
                }
@@ -451,20 +451,12 @@ public class ElytraFly extends Module {
             /*
              * "You are flying in NEW" [20] N = [18]
              * "You are flying in OLD" [20] O = [18]
-             * "Turn down your elytra settings, speed is restricted in new chunks" [64] A =
-             * [18]
-             * "Turn down your elytra settings, speed is restricted in spawn chunks" [66] A
-             * = [18]
+             * "Turn down your elytra settings, speed is restricted in new chunks" [64] A = [18]
+             * "Turn down your elytra settings, speed is restricted in spawn chunks" [66] A = [18]
              * "Turn down your elytra settings, you are going too fast" [53] A = [18]
-             *
              */
          }
       }
-      currentMode.onTick();
-   }
-
-   @EventHandler
-   private void onTick(TickEvent.Post event) {
       currentMode.onTick();
    }
 
