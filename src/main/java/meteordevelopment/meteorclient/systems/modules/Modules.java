@@ -22,6 +22,7 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.System;
 import meteordevelopment.meteorclient.systems.Systems;
 import meteordevelopment.meteorclient.systems.modules.JJhack.JAutoSprint;
+import meteordevelopment.meteorclient.systems.modules.JJhack.JChunkTests;
 import meteordevelopment.meteorclient.systems.modules.combat.*;
 import meteordevelopment.meteorclient.systems.modules.misc.*;
 import meteordevelopment.meteorclient.systems.modules.misc.swarm.Swarm;
@@ -379,9 +380,22 @@ public class Modules extends System<Modules> {
         // Register color settings for the module
         module.settings.registerColorSettings(module);
     }
+
+    //JJHack
+    private String actionBar;
+
+    public void setActionBar(String actionBar) {
+        this.actionBar = actionBar;
+    }
+
+    public String getActionBar() {
+        return this.actionBar;
+    }
+
+
     private void initJJhack(){
         add (new JAutoSprint());
-
+        add (new JChunkTests());
     }
 
 
