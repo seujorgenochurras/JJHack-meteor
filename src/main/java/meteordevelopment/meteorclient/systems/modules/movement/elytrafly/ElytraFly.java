@@ -402,64 +402,64 @@ public class ElytraFly extends Module {
    @EventHandler
    private void onSpeedSlow(PlaySoundEvent event) {
       if (modeSetting.get() != JJHackMode.Off) {
-
          if (mc.player.isFallFlying() && event.sound.getId().getPath().equals("entity.experience_orb.pickup")) {
             event.setCancelled(true);
-            this.horizontalSpeed.set(horizontalSlow.get() + 0.017);
-            if (logInChat.get()) {
-               info("Speed slow");
+            if(jFlySetting.get() == JJFlyVersion.Old) {
+               this.horizontalSpeed.set(horizontalSlow.get() + 0.0199);
+               isFast = false;
+               if (logInChat.get()) {
+                  info("Speed slow");
+               }
             }
-
          }
       }
    }
 
-   private String actionBar;
-
-   public void setActionBar(String actionBar) {
-      this.actionBar = actionBar;
-   }
-
-   public String getActionBar() {
-      return this.actionBar;
-   }
-
+   private boolean isFast = false;
+            int tick = 0;
    @EventHandler
    private void onTick(TickEvent.Post event) {
       currentMode.onTick();
       if (modeSetting.get() != JJHackMode.Off) {
          if (jFlySetting.get().equals(JJFlyVersion.Old)) {
-            int tick = 0;
-            tick++;
-            if (tick == checkDelay.get()) {
-               this.horizontalSpeed.set(horizontalFast.get() + 0.017);
+            if(isFast) return;
+            if(tick == checkDelay.get()) {
+                  tick =0;
+                  this.horizontalSpeed.set(horizontalFast.get() + 0.0199);
+                  isFast = true;
+                  if (logInChat.get()) {
+                     info("Speed fast");
+                  }
+               } else tick++;
+         } else if (jFlySetting.get().equals(JJFlyVersion.New)) {
+         String actionBar = Modules.get().getActionBar();
+         if (actionBar.length() > 0) {
+            if (!isFast && actionBar.charAt(18) == 'O') {
+               this.horizontalSpeed.set(horizontalFast.get() + 0.0199);
+               isFast = true;
                if (logInChat.get()) {
                   info("Speed fast");
                }
-            }
-         } else if (jFlySetting.get().equals(JJFlyVersion.New)) {
-            String actionBar = getActionBar();
-            if (actionBar.length() > 0) {
-
-               if (actionBar.charAt(18) == 'O') {
-                  this.horizontalSpeed.set(horizontalFast.get() + 0.018);
-               }
-               if (actionBar.charAt(18) == 'N' || actionBar.charAt(18) == 'A') {
-                  this.horizontalSpeed.set(horizontalSlow.get() + 0.018);
+            }else if(isFast && actionBar.charAt(18) == 'N' || actionBar.charAt(18) == 't') {
+               this.horizontalSpeed.set(horizontalSlow.get() + 0.0199);
+               isFast = false;
+               if (logInChat.get()) {
+                  info("Speed slow");
                }
             }
+         }
             /*
+             * All the possible actionbar messages
+             *
              * "You are flying in NEW" [20] N = [18]
              * "You are flying in OLD" [20] O = [18]
-             * "Turn down your elytra settings, speed is restricted in new chunks" [64] A = [18]
-             * "Turn down your elytra settings, speed is restricted in spawn chunks" [66] A = [18]
-             * "Turn down your elytra settings, you are going too fast" [53] A = [18]
+             * "Turn down your elytra settings, speed is restricted in new chunks" [64] t = [18]
+             * "Turn down your elytra settings, speed is restricted in spawn chunks" [66] t = [18]
+             * "Turn down your elytra settings, you are going too fast" [53] t = [18]
              */
          }
       }
-      currentMode.onTick();
    }
-
    @EventHandler
    private void onPacketSend(PacketEvent.Send event) {
       currentMode.onPacketSend(event);
