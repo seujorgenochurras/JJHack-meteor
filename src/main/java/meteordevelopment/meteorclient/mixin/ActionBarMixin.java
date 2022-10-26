@@ -21,6 +21,4 @@ public class ActionBarMixin {
    private void getActionBar(Text message, boolean tinted, CallbackInfo info){
       Modules.get().setActionBar(message.getString());
    }
-
-
 }

@@ -401,7 +401,7 @@ public class ElytraFly extends Module {
    // JJHack
    @EventHandler
    private void onSpeedSlow(PlaySoundEvent event) {
-      if (modeSetting.get() != JJHackMode.Off) {
+      if (modeSetting.get() != JJHackMode.Off && mc.player.isFallFlying()) {
          if (mc.player.isFallFlying() && event.sound.getId().getPath().equals("entity.experience_orb.pickup")) {
             event.setCancelled(true);
             if(jFlySetting.get() == JJFlyVersion.Old) {
@@ -416,11 +416,11 @@ public class ElytraFly extends Module {
    }
 
    private boolean isFast = false;
-            int tick = 0;
+   int tick = 0;
    @EventHandler
    private void onTick(TickEvent.Post event) {
       currentMode.onTick();
-      if (modeSetting.get() != JJHackMode.Off) {
+      if (modeSetting.get() != JJHackMode.Off && mc.player.isFallFlying()) {
          if (jFlySetting.get().equals(JJFlyVersion.Old)) {
             if(isFast) return;
             if(tick == checkDelay.get()) {
@@ -433,7 +433,7 @@ public class ElytraFly extends Module {
                } else tick++;
          } else if (jFlySetting.get().equals(JJFlyVersion.New)) {
          String actionBar = Modules.get().getActionBar();
-         if (actionBar.length() > 0) {
+         if (actionBar != null && actionBar.length() > 17) {
             if (!isFast && actionBar.charAt(18) == 'O') {
                this.horizontalSpeed.set(horizontalFast.get() + 0.0199);
                isFast = true;
@@ -443,9 +443,7 @@ public class ElytraFly extends Module {
             }else if(isFast && actionBar.charAt(18) == 'N' || actionBar.charAt(18) == 't') {
                this.horizontalSpeed.set(horizontalSlow.get() + 0.0199);
                isFast = false;
-               if (logInChat.get()) {
-                  info("Speed slow");
-               }
+               if (logInChat.get()) info("Speed slow");
             }
          }
             /*
