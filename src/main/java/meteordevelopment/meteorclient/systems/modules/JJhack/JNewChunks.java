@@ -24,7 +24,7 @@ import static java.lang.Math.*;
 public class JNewChunks extends Module{
 
    public JNewChunks(){
-      super(Categories.JJHACK, "JJNewChunks", "Testing");
+      super(Categories.JJHACK, "JJNewChunks", "Search for old chunks (chunks that someone else walked)");
    }
 
    private final SettingGroup sgVars = settings.createGroup("Settings");
