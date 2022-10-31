@@ -2,7 +2,7 @@
 <img src="https://cdn.discordapp.com/attachments/420367190580002851/1032411747031724132/Logo-jjMeteor.png" alt="JJmeteor-logo" width="40%"/>
 </p>
 
-<h1 align="center">Meteor Client</h1>
+<h1 align="center">JJMeteor Client</h1>
 <p align="center">A Minecraft Fabric Utility Mod for anarchy servers.</p>
 
 <div align="center">
@@ -17,7 +17,7 @@
 </div>
 
 # JJHack
-**MOD IS MADE ESPECIALLY FOR AntiAnarchyFixes**
+**MOD IS MADE ESPECIALLY FOR AntiAnarchyFixes (1.17)**
 
 I've been doing this skid just for learning more about Java and hacking in general, i'm a total newfag and have no knowledge about what i'm doing so
 pls dont be serious about this mod
@@ -26,13 +26,14 @@ This mod is focused on a Brazilian anarchy server (Anarkcraft), so i will try my
 
 ## Modules & Bypasses
 First of all, there's NO ACTUALL bypass (at least for now)
-The skid right now had only change the Elytra Fly module and created a dummy category (HUD)
-
+The new/modified modules are: elytra fly, and JNewChunks.
 ### Elytra Fly changes:
    - Bypass on limit of your elytra's speed (you will go ~0.02 faster);
    - Faster Elytra fly on AnarchyExploitsFixes anti Elytra
         By checking the screen where it says if player is able to go faster or not;
         Or by time checking if player is able to go faster;
+### New Chunks
+    - Theres nothing special in JJMeteor new chunks, It shows chunks where someone else has walked on;
 
 and of course, i would like to receive advices (without telling me im a stupid simpson's monkey or smth)
 
