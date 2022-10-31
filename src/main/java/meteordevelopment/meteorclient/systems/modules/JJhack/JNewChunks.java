@@ -8,7 +8,7 @@ package meteordevelopment.meteorclient.systems.modules.JJhack;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.BoolSetting;
-import meteordevelopment.meteorclient.settings.IntSetting;
+import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
@@ -16,66 +16,35 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.sound.Sound;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.sound.SoundEvents;
-
-
+import net.minecraft.util.math.BlockPos;
 import java.util.ArrayList;
-import java.util.Objects;
 
 import static java.lang.Math.*;
 
-public class JChunkTests extends Module{
+public class JNewChunks extends Module{
 
-   public JChunkTests(){
-      super(Categories.JJHACK, "JChunkExploit", "Testing");
+   public JNewChunks(){
+      super(Categories.JJHACK, "JJNewChunks", "Testing");
    }
 
-   private final SettingGroup sgVars = settings.createGroup("variaveis");
+   private final SettingGroup sgVars = settings.createGroup("Settings");
 
-   private final Setting<Integer> x = sgVars.add(new IntSetting.Builder()
-           .name("X")
-           .description("aaa")
-                   .defaultValue(128)
-                   .sliderMax(300)
-           .build()
-   );
-   private final Setting<Integer> z = sgVars.add(new IntSetting.Builder()
-           .name("z")
-           .description("aaa")
-           .defaultValue(128)
-
-           .sliderMax(300)
-           .build()
-   );
    private final Setting<Boolean> logOnChat = sgVars.add(new BoolSetting.Builder()
-           .name("log")
-           .description("aaa")
+           .name("Log on chat")
+           .description("Log on chat some debug stuff")
            .defaultValue(false)
            .build()
    );
-   private final Setting<Integer> x2 = sgVars.add(new IntSetting.Builder()
-           .name("X2")
-           .description("aaa")
-           .defaultValue(128)
+   public enum JJNewChunksVersion {
+      onExploit,
+      all
+   }
 
-           .sliderMax(300)
-           .build()
-   );
-   private final Setting<Integer> z2 = sgVars.add(new IntSetting.Builder()
-           .name("z2")
-           .description("aaa")
-           .defaultValue(128)
-           .sliderMax(300)
-           .build()
-   );
 
-   private final Setting<Integer> excludeSmth = sgVars.add(new IntSetting.Builder()
-           .name("excludeDir")
-           .description("aaa")
-           .defaultValue(1)
-           .sliderMax(8)
+   public final Setting<JJNewChunksVersion> JJChunksSetting = sgVars.add(new EnumSetting.Builder<JJNewChunksVersion>()
+           .name("Mode")
+           .description("Render only onExploit or all")
+           .defaultValue(JJNewChunksVersion.all)
            .build()
    );
 
@@ -84,17 +53,17 @@ public class JChunkTests extends Module{
    @EventHandler
    private void onRender(Render3DEvent render3DEvent){
       for(JChunks JChunks : loadedChunks){
-         render(render3DEvent, JChunks);
+         if (mc.getCameraEntity().getBlockPos().isWithinDistance(JChunks.getStartPos(), 1024)){ // I have no idea
+            render(render3DEvent, JChunks);
+         }
       }
    }
    private void render(Render3DEvent event, JChunks chunk){
-      event.renderer.boxLines(chunk.getX(), 0, chunk.getZ(), chunk.getX2(),0,chunk.getZ2(), Color.RED, excludeSmth.get());
+      event.renderer.boxLines(chunk.getX(), 0, chunk.getZ(), chunk.getX2(),0,chunk.getZ2(), Color.RED, 1);
    }
-   private JChunks chunk;
-   @EventHandler
-   private void onWalk(TickEvent.Post event){
 
-       chunk = new JChunks(mc.player.getChunkPos().getStartX(), mc.player.getChunkPos().getStartZ());
+   private void addChunk(){
+      JChunks chunk = new JChunks(mc.player.getChunkPos().getStartX(), mc.player.getChunkPos().getStartZ());
 
        //handle null
       if(loadedChunks.isEmpty()) {
@@ -106,23 +75,26 @@ public class JChunkTests extends Module{
          || abs(chunk.getZ() - lastChunk.getZ()) > 15.9){
             chunk.addChunk();
          }
-
    }
 
    private boolean hasChanged = false;
-   private boolean hasChangedCopy = false;
    private long timeNew;
    private long timeOld;
 
 
    private String lastBar = "";
-
    @EventHandler
-   private void onExploitOccur(TickEvent.Pre event) {
+   private void onExploitOccur(TickEvent.Post event) {
       String actionBar = Modules.get().getActionBar();
+      if(Math.round(mc.player.speed) < 19) return;
       if (actionBar == null || lastBar == null || actionBar.length() < 18) return;
 
-      if (actionBar.charAt(18) == 'N' || actionBar.charAt(18) == 'O') {
+
+      if (actionBar.charAt(18) == 'O') { // player is already on old chunks
+         if (JJChunksSetting.get() == JJNewChunksVersion.all) {
+            addChunk();
+         }
+      } else if(actionBar.charAt(18) == 'N'){
          if (actionBar.equals(lastBar)) {
             timeOld = System.currentTimeMillis();
             hasChanged = false;
@@ -133,9 +105,9 @@ public class JChunkTests extends Module{
          lastBar = actionBar;
       }
       if(hasChanged){
+         if(logOnChat.get()) info("Exploit occur");
          if(timeNew - timeOld < 80){
-            if(logOnChat.get()) System.out.println(timeNew - timeOld);
-            mc.player.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 21, 21);
+            addChunk();
          }
       }
    }
@@ -151,22 +123,26 @@ public class JChunkTests extends Module{
          setZ(z);
       }
       public int getX() {
-         return this.x;
+        return this.x;
       }
+      public BlockPos getStartPos(){
+         return new BlockPos(this.getX(), 0, this.getZ());
+      }
+
       public void setX(int x) {
-         this.x = x + 128;
+         this.x = x;
       }
       public int getZ() {
          return this.z;
       }
       public void setZ(int z) {
-         this.z = z + 128;
+         this.z = z;
       }
       public double getX2() {
-         return x + 144;
+         return x + 16;
       }
       public double getZ2() {
-         return z + 144;
+         return z + 16;
       }
 
    }
