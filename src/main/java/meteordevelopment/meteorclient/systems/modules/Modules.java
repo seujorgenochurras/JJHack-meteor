@@ -395,9 +395,9 @@ public class Modules extends System<Modules> {
 
 
     private void initJJhack(){
-        add (new JAutoSprint());
+        //add (new JAutoSprint());
         add (new JNewChunks());
-        add(new JTesting());
+        //add(new JTesting());
     }
     private void initCombat() {
         add(new AimAssist());

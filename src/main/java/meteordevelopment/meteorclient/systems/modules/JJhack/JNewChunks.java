@@ -7,10 +7,7 @@ package meteordevelopment.meteorclient.systems.modules.JJhack;
 
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.settings.BoolSetting;
-import meteordevelopment.meteorclient.settings.EnumSetting;
-import meteordevelopment.meteorclient.settings.Setting;
-import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -35,25 +32,33 @@ public class JNewChunks extends Module{
            .defaultValue(false)
            .build()
    );
-   public enum JJNewChunksVersion {
+   private enum JJNewChunksVersion {
       onExploit,
       all
    }
-
-
    public final Setting<JJNewChunksVersion> JJChunksSetting = sgVars.add(new EnumSetting.Builder<JJNewChunksVersion>()
            .name("Mode")
            .description("Render only onExploit or all")
            .defaultValue(JJNewChunksVersion.all)
            .build()
    );
+   public final Setting<Integer> renderDistance = sgVars.add(new IntSetting.Builder()
+           .name("Render Distance")
+           .description("Distance of render")
+           .defaultValue(1024)
+           .sliderMin(256)
+           .sliderMax(2048)
+                   .max(Integer.MAX_VALUE)
+           .min(16)
 
+           .build()
+   );
    private final ArrayList<JChunks> loadedChunks = new ArrayList<>();
 
    @EventHandler
    private void onRender(Render3DEvent render3DEvent){
       for(JChunks JChunks : loadedChunks){
-         if (mc.getCameraEntity().getBlockPos().isWithinDistance(JChunks.getStartPos(), 1024)){ // I have no idea
+         if (mc.getCameraEntity().getBlockPos().isWithinDistance(JChunks.getStartPos(), renderDistance.get())){ // I have no idea
             render(render3DEvent, JChunks);
          }
       }
